@@ -54,6 +54,9 @@ class Duck(object):
 
 class Penguin(object):
 
+    def __init__(self):
+        self.fly = self.aviate  # reference to aviate method, no ()
+
     def walk(self):
         print("Waddle, waddle, I waddle too")
 
@@ -63,11 +66,46 @@ class Penguin(object):
     def quack(self):
         print("Are you 'avin' a larf? I'm a penguin!")
 
+    def aviate(self):
+        print("I won the lottery and bought a learjet")
+
 
 # def test_duck(duck):
 #     duck.walk()
 #     duck.swim()
 #     duck.quack()
+
+class Mallard(Duck):
+    pass
+
+
+class Flock(object):        # The pythonic way for exception raising below is to focus on the behavior and not
+                            # the actual object type
+    def __init__(self):
+        self.flock = []
+
+    def add_duck(self, duck: Duck) -> None:
+        # if type(duck) is Duck:      # Never do this, not pythonic and wrong!
+        # if isinstance(duck, Duck):  # still not pythonic.
+        fly_method = getattr(duck, 'fly', None)
+        if callable(fly_method):
+            self.flock.append(duck)
+        else:
+            raise TypeError("Cannot add duck, are you sure it's not a " + str(type(duck).__name__))
+
+    def migrate(self):
+        problem = None
+        for duck in self.flock:
+            try:
+                duck.fly()
+                raise AttributeError("Testing exception handler in migrate")  # useful for testing exceptions
+                # TODO remove ^ before release
+            except AttributeError as e:
+                print("One duck down")
+                problem = e
+                # raise   # raises exception, will print stack trace
+        if problem:
+            raise problem
 
 
 if __name__ == '__main__':
